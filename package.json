@@ -10,6 +10,8 @@
     "typescript": "^5.8.2"
   },
   "dependencies": {
-    "fastmcp": "^1.20.5"
+    "@google/generative-ai": "^0.24.0",
+    "fastmcp": "^1.20.5",
+    "zod": "^3.24.2"
   }
 }

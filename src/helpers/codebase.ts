@@ -1,11 +1,17 @@
 export interface FileSystemItem {
   name: string;
+  absoluteParentPath: string;
+  updatedAt: string;
 }
 
 
-export interface File extends FileSystemItem {
+export interface FileItem extends FileSystemItem {
   content: {
+    type: "link";
+    target: string;
+  } | {
     type: "binary";
+    size: number;
   } | {
     type: "text";
     text: string;
@@ -13,20 +19,14 @@ export interface File extends FileSystemItem {
 }
 
 
-interface Folder extends FileSystemItem {
-  folders: Folder[];
-  files: File[];
+export interface FolderItem extends FileSystemItem {
+  folders: FolderItem[];
+  files: FileItem[];
 }
-
 
 
 export const CODEBASE = {
 
-  content: {
-    folders: [] as Folder[],
-    files: [] as File[],
-  },
+  content: null as FolderItem | FileItem | null,
 
-  updatedAt: new Date(0),
-
-}
+};

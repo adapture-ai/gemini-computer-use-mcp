@@ -1,5 +1,7 @@
 import { FastMCP } from "fastmcp";
-import { addAskTool } from "./tools/addAskTool";
+
+import { indexCodebase } from "./helpers/indexCodebase";
+import { addAskCodebaseTool } from "./tools/addAskCodebaseTool";
 
 
 const server = new FastMCP({
@@ -8,9 +10,25 @@ const server = new FastMCP({
 });
 
 
-addAskTool(server);
+addAskCodebaseTool(server);
 
 
-server.start({
-  transportType: "stdio",
-});
+await Promise.all([
+
+  (async () => {
+    console.log("Starting Codebase MCP server...");
+    await server.start({
+      transportType: "sse",
+      sse: {
+        endpoint: "/sse",
+        port: 3001,
+      },
+    });
+  })(),
+
+  (async () => {
+    console.log("Indexing codebase...");
+    await indexCodebase();
+  })(),
+
+]);

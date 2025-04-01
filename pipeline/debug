@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+# Environment Flags
+set -o errexit  # Exit when a command fails
+set -o pipefail # Catch mysqldump fails
+set -o nounset  # Exit when using undeclared variables
+
+(
+  set -x
+  bun x fastmcp dev ./src/index.ts
+)
