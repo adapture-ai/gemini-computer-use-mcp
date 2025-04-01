@@ -7,5 +7,5 @@ set -o nounset  # Exit when using undeclared variables
 
 (
   set -x
-  bun x fastmcp dev ./src/index.ts
+  bun ./src/index.ts
 )

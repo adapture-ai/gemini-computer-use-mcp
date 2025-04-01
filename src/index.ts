@@ -16,18 +16,14 @@ addAskCodebaseTool(server);
 await Promise.all([
 
   (async () => {
-    console.log("Starting Codebase MCP server...");
+    // console.log("Starting Codebase MCP server...");
     await server.start({
-      transportType: "sse",
-      sse: {
-        endpoint: "/sse",
-        port: 3001,
-      },
+      transportType: "stdio",
     });
   })(),
 
   (async () => {
-    console.log("Indexing codebase...");
+    // console.log("Indexing codebase...");
     await indexCodebase();
   })(),
 

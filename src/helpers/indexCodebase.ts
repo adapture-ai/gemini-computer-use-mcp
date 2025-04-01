@@ -20,12 +20,12 @@ export async function indexCodebase() {
 async function loadPath(absolutePath: string): Promise<FolderItem | FileItem | null> {
 
   if (!existsSync(absolutePath)) {
-    console.warn(absolutePath, "Not exists");
+    // console.warn(absolutePath, "Not exists");
     return null;
   }
 
 
-  console.log(absolutePath, "Loading...");
+  // console.log(absolutePath, "Loading...");
 
   const absoluteParentPath = dirname(absolutePath);
   const name = basename(absolutePath);
@@ -91,7 +91,7 @@ async function loadPath(absolutePath: string): Promise<FolderItem | FileItem | n
   if (stats.isFile()) {
 
     if (stats.size > 1024 * 1024) {
-      console.warn(absolutePath, "Large file, considered binary.");
+      // console.warn(absolutePath, "Large file, considered binary.");
       const file: FileItem = {
         name: name,
         absoluteParentPath: absoluteParentPath,
@@ -104,7 +104,7 @@ async function loadPath(absolutePath: string): Promise<FolderItem | FileItem | n
       return file;
     }
 
-    console.log(absolutePath, "Loading text content...");
+    // console.log(absolutePath, "Loading text content...");
     const file: FileItem = {
       name: name,
       absoluteParentPath: absoluteParentPath,
@@ -117,6 +117,6 @@ async function loadPath(absolutePath: string): Promise<FolderItem | FileItem | n
     return file;
   }
 
-  console.warn(absolutePath, "Ignored unknown file type");
+  // console.warn(absolutePath, "Ignored unknown file type");
   return null;
 }
