@@ -1,7 +1,8 @@
 import { FastMCP } from "fastmcp";
 
 import { indexCodebase } from "./helpers/indexCodebase";
-import { addAskCodebaseTool } from "./tools/addAskCodebaseTool";
+import { addCodebaseResource } from "./resources/getCodebaseResource";
+import { addAskCodebaseTool } from "./tools/askCodebaseTool";
 
 
 const server = new FastMCP({
@@ -10,6 +11,7 @@ const server = new FastMCP({
 });
 
 
+addCodebaseResource(server);
 addAskCodebaseTool(server);
 
 

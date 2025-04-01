@@ -2,30 +2,39 @@ import { existsSync } from "fs";
 import { readdir, readFile, readlink, stat } from "fs/promises";
 import { basename, dirname, resolve } from "path";
 
-import { CODEBASE, type FileItem, type FolderItem } from "./codebase";
+import { CODEBASE, type FileItem } from "./codebase";
+
+
+const LOG_ENABLED = false;
 
 
 export async function indexCodebase() {
 
-  const codebasePath = process.env.CODEBASE_PATH;
+  const codebasePath = Bun.env.CODEBASE_PATH;
   if (!codebasePath) {
     throw new Error("CODEBASE_PATH environment variable is not set.");
   }
 
   const absoluteCodebasePath = resolve(process.cwd(), codebasePath);
-  CODEBASE.content = await loadPath(absoluteCodebasePath);
+  const files = await loadPath(absoluteCodebasePath);
+  files.sort((a, b) => {
+    if (a.folderPath !== b.folderPath) {
+      return a.folderPath.localeCompare(b.folderPath);
+    }
+    return a.fileName.localeCompare(b.fileName);
+  });
+  CODEBASE.files = files;
 }
 
 
-async function loadPath(absolutePath: string): Promise<FolderItem | FileItem | null> {
+async function loadPath(absolutePath: string): Promise<FileItem[]> {
 
   if (!existsSync(absolutePath)) {
-    // console.warn(absolutePath, "Not exists");
-    return null;
+    if (LOG_ENABLED) console.warn(absolutePath, "Not exists");
+    return [];
   }
 
-
-  // console.log(absolutePath, "Loading...");
+  // if (LOG_ENABLED) console.log(absolutePath, "Loading...");
 
   const absoluteParentPath = dirname(absolutePath);
   const name = basename(absolutePath);
@@ -41,82 +50,84 @@ async function loadPath(absolutePath: string): Promise<FolderItem | FileItem | n
       name === ".browsers" ||
       name === ".git" ||
       name === ".next" ||
+      name === ".types" ||
       name === ".venv" ||
       name === "build" ||
       name === "node_modules"
     ) {
-      const folder: FolderItem = {
-        name: name,
-        absoluteParentPath: absoluteParentPath,
-        updatedAt: updatedAt,
-        folders: [],
-        files: [],
-      };
-      return folder;
+      return [];
     }
 
     const childrenPaths = await readdir(absolutePath);
 
-    const children = await Promise.all(childrenPaths.map(async (childPath) => {
+    const files = (await Promise.all(childrenPaths.map(async (childPath) => {
       const absoluteChildPath = `${absolutePath}/${childPath}`;
-      const child = await loadPath(absoluteChildPath);
-      return child;
-    }));
+      const children = await loadPath(absoluteChildPath);
+      return children;
+    }))).flat();
 
-    const folder: FolderItem = {
-      name: name,
-      absoluteParentPath: absoluteParentPath,
-      updatedAt: updatedAt,
-      folders: children.filter((child): child is FolderItem => child !== null && !("content" in child)),
-      files: children.filter((child): child is FileItem => child !== null && "content" in child),
-    };
+    return files;
+  }
 
-    return folder;
+  if (
+    name === ".DS_Store" ||
+    name === "package-lock.json" ||
+    name === "pnpm-lock.yaml" ||
+    name === "yarn.lock" ||
+    name === "yarn-error.log" ||
+    name === "yarn-debug.log" ||
+    name === "bun.lock" ||
+    name === "uv.lock" ||
+    name === "LICENSE.txt" ||
+    name.endsWith(".pyc") ||
+    name.endsWith(".log")
+  ) {
+    return [];
   }
 
   if (stats.isSymbolicLink()) {
     const targetPath = await readlink(absolutePath);
     const file: FileItem = {
-      name: name,
-      absoluteParentPath: absoluteParentPath,
+      fileName: name,
+      folderPath: absoluteParentPath,
       updatedAt: updatedAt,
       content: {
         type: "link",
         target: targetPath,
       },
     };
-    return file;
+    return [file];
   }
 
   if (stats.isFile()) {
 
-    if (stats.size > 1024 * 1024) {
-      // console.warn(absolutePath, "Large file, considered binary.");
+    if (stats.size > 5 * 1024 * 1024) {
+      if (LOG_ENABLED) console.warn(absolutePath, "Large file -> binary");
       const file: FileItem = {
-        name: name,
-        absoluteParentPath: absoluteParentPath,
+        fileName: name,
+        folderPath: absoluteParentPath,
         updatedAt: updatedAt,
         content: {
           type: "binary",
           size: stats.size,
         },
       };
-      return file;
+      return [file];
     }
 
-    // console.log(absolutePath, "Loading text content...");
+    if (LOG_ENABLED) console.log(absolutePath);
     const file: FileItem = {
-      name: name,
-      absoluteParentPath: absoluteParentPath,
+      fileName: name,
+      folderPath: absoluteParentPath,
       updatedAt: updatedAt,
       content: {
         type: "text",
         text: await readFile(absolutePath, "utf-8"),
       },
     };
-    return file;
+    return [file];
   }
 
-  // console.warn(absolutePath, "Ignored unknown file type");
-  return null;
+  if (LOG_ENABLED) console.warn(absolutePath, "Unknown type");
+  return [];
 }
