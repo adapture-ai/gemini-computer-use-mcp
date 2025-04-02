@@ -1,32 +1,32 @@
-import { FastMCP } from "fastmcp";
+/* eslint-disable import/extensions */
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 
-import { indexCodebase } from "./helpers/indexCodebase";
-import { addCodebaseResource } from "./resources/getCodebaseResource";
+import { codebase } from "./helpers/codebase";
+import { logger } from "./helpers/logger";
+import { addServerEventListener, server } from "./helpers/server";
 import { addAskCodebaseTool } from "./tools/askCodebaseTool";
 
 
-const server = new FastMCP({
-  name: "Codebase",
-  version: "0.0.1",
-});
+try {
 
 
-addCodebaseResource(server);
-addAskCodebaseTool(server);
+  addAskCodebaseTool(server);
 
 
-await Promise.all([
+  codebase.startIndexing();
 
-  (async () => {
-    // console.log("Starting Codebase MCP server...");
-    await server.start({
-      transportType: "stdio",
-    });
-  })(),
+  addServerEventListener("close", () => {
+    codebase.stopIndexing();
+  });
 
-  (async () => {
-    // console.log("Indexing codebase...");
-    await indexCodebase();
-  })(),
 
-]);
+  const transport = new StdioServerTransport();
+  await server.connect(transport);
+
+
+} catch (error) {
+
+  await logger.error("Error in main:", error);
+
+  throw error;
+}

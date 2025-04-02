@@ -1,140 +1,75 @@
-import { ChatSession, GoogleGenerativeAI } from "@google/generative-ai";
-import type { FastMCP } from "fastmcp";
-import { existsSync } from "fs";
-import { appendFile, mkdir, unlink, writeFile } from "fs/promises";
+/* eslint-disable import/extensions */
+import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 
-import { getCodebaseTexts } from "../resources/getCodebaseResource";
+import { ai } from "../helpers/ai";
+import { codebase } from "../helpers/codebase";
+import { MODEL } from "../helpers/config";
+import { logger } from "../helpers/logger";
 
 
-let getChatSessionPromise: Promise<{
-  chatSession: ChatSession;
-  codebaseFile: string;
-  codebaseResponseFile: string;
-}> | null = null;
+export function addAskCodebaseTool(server: McpServer) {
 
+  server.tool(
 
-async function getChatSession() {
+    // Name
+    "Ask Codebase",
 
-  getChatSessionPromise ??= (async () => {
+    // Description
+    "Ask a question about the codebase",
 
-    const codebaseFolder = `${Bun.env.CODEBASE_PATH}/.codebase`;
-    if (!existsSync(codebaseFolder)) {
-      await mkdir(codebaseFolder, { recursive: true });
-    }
-
-    const codebaseFile = `${codebaseFolder}/codebase.log`;
-    if (existsSync(codebaseFile)) {
-      await unlink(codebaseFile);
-    }
-
-    const codebaseResponseFile = `${codebaseFolder}/codebase-response.log`;
-    if (existsSync(codebaseResponseFile)) {
-      await unlink(codebaseResponseFile);
-    }
-
-    const apiKey = Bun.env.GOOGLE_API_KEY;
-    if (!apiKey) {
-      throw new Error("GOOGLE_API_KEY environment variable is not set");
-    }
-
-    const genAI = new GoogleGenerativeAI(apiKey);
-
-    const model = genAI.getGenerativeModel({
-      model: "gemini-1.5-pro",
-      systemInstruction: `
-        You are a helpful assistant that answers questions about the codebase.
-        The first message will be the codebase, just say 'OK' when you receive it. Do not say anything else.
-        From the second message onwards, each message will be a question. Answer those questions based on the codebase you received in the first message.
-      `,
-    });
-
-    const chatSession = model.startChat();
-
-    const texts = getCodebaseTexts().join("\n\n");
-    await writeFile(codebaseFile, texts, "utf-8");
-
-    await appendFile(codebaseResponseFile, `${new Date().toISOString()} Request:\n`, "utf-8");
-    await appendFile(codebaseResponseFile, `${new Date().toISOString()} (Sending ${texts.split("\n").length} lines of codebase...)\n\n`, "utf-8");
-    const t0 = Date.now();
-    const response1 = await chatSession.sendMessage(texts);
-    const t1 = Date.now();
-    await appendFile(codebaseResponseFile, `${new Date().toISOString()} Response:\n`, "utf-8");
-    await appendFile(codebaseResponseFile, `${new Date().toISOString()} ${response1.response.text()}`, "utf-8");
-    await appendFile(codebaseResponseFile, `${new Date().toISOString()} (Took ${((t1 - t0) / 1000.0).toFixed(1)}) seconds.\n\n`, "utf-8");
-
-    return {
-      chatSession: chatSession,
-      codebaseFile: codebaseFile,
-      codebaseResponseFile: codebaseResponseFile,
-    };
-
-  })();
-
-  const result = await getChatSessionPromise;
-  return result;
-}
-
-
-export function addAskCodebaseTool<T extends Record<string, unknown> | undefined>(server: FastMCP<T>) {
-
-  server.addTool({
-
-    name: "Ask Codebase",
-    description: "Ask a question about the codebase",
-
-    parameters: z.object({
+    // Params Schema
+    {
       question: z.string(),
-    }),
+    },
 
-    execute: async (args, context) => {
+    // Callback
+    async (args, extra) => {
 
       const {
         question,
       } = args;
 
       const {
-        session,
-        log,
-        reportProgress,
-      } = context;
+        signal,
+      } = extra;
 
-      log.info("Session ID:", `${session?.id}`);
-      log.info("Question:", question);
+      signal.throwIfAborted();
 
-      await reportProgress({
-        progress: 0,
-        total: 100,
+      await logger.info("Getting context cache...");
+      const ta0 = Date.now();
+      const cache = await codebase.getCache({
+        model: MODEL,
+        systemInstructions: "You are a helpful assistant that answers questions about the codebase.",
       });
+      const ta1 = Date.now();
+      await logger.info("Context cache retrieved in", ((ta1 - ta0) / 1000.0).toFixed(1), "seconds.");
 
-      const {
-        chatSession,
-        codebaseResponseFile,
-      } = await getChatSession();
+      signal.throwIfAborted();
 
-      await reportProgress({
-        progress: 50,
-        total: 100,
+      await logger.info(`Asking question: ${question}...`);
+      const t2 = Date.now();
+      const response = await ai.models.generateContent({
+        model: MODEL,
+        contents: question,
+        config: {
+          ...(cache ? { cachedContent: cache.name } : {}),
+        },
       });
+      const t3 = Date.now();
+      await logger.info("Question answered in", ((t3 - t2) / 1000.0).toFixed(1), "seconds.");
 
-      await appendFile(codebaseResponseFile, `${new Date().toISOString()} Request:\n`, "utf-8");
-      await appendFile(codebaseResponseFile, `${new Date().toISOString()} ${question}\n\n`, "utf-8");
-      const t0 = Date.now();
-      const response2 = await chatSession.sendMessage(question);
-      const t1 = Date.now();
-      const text = response2.response.text();
-      await appendFile(codebaseResponseFile, `${new Date().toISOString()} Response:\n`, "utf-8");
-      await appendFile(codebaseResponseFile, `${new Date().toISOString()} ${text}`, "utf-8");
-      await appendFile(codebaseResponseFile, `${new Date().toISOString()} (Took ${((t1 - t0) / 1000.0).toFixed(1)}) seconds.\n\n`, "utf-8");
+      signal.throwIfAborted();
 
-      await reportProgress({
-        progress: 100,
-        total: 100,
-      });
+      return {
+        content: [{
+          type: "text",
+          text: response.text || "",
+        }],
+      };
 
-      return text;
     },
 
-  });
+  );
 
 }
