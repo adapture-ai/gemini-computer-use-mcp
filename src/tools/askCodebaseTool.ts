@@ -13,14 +13,15 @@ export function addAskCodebaseTool(server: McpServer) {
   server.tool(
 
     // Name
-    "Ask Codebase",
+    "ask_codebase",
 
     // Description
     "Ask a question about the codebase",
 
     // Params Schema
     {
-      question: z.string(),
+      question: z.string().describe("The question to ask the codebase"),
+      // path: z.string().describe("The path to a file or directory to search in"),
     },
 
     // Callback
