@@ -53,7 +53,9 @@ async function loadPath(absolutePath: string): Promise<FileItem[]> {
       name === ".types" ||
       name === ".venv" ||
       name === "build" ||
-      name === "node_modules"
+      name === "node_modules" ||
+      name === ".githooks" ||
+      name.includes("-mcp")
     ) {
       return [];
     }
@@ -80,6 +82,8 @@ async function loadPath(absolutePath: string): Promise<FileItem[]> {
     name === "uv.lock" ||
     name === "LICENSE.txt" ||
     name.endsWith(".pyc") ||
+    name.endsWith(".roomodes") ||
+    name.endsWith(".sum") || // like .lock but for golang
     name.endsWith(".log")
   ) {
     return [];
