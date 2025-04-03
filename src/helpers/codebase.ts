@@ -4,8 +4,11 @@ import { readdir, readFile, readlink, stat } from "fs/promises";
 import { basename, dirname } from "path";
 
 import { ai } from "./ai";
-import { CODEBASE_PATH } from "./config";
+import { CODEBASE_PATH, MODEL } from "./config";
 import { logger } from "./logger";
+
+
+const TTL = 15 * 60; // 15 minutes
 
 
 class Codebase {
@@ -15,7 +18,7 @@ class Codebase {
 
   startIndexing() {
     if (this.timer) return;
-    logger.info("Starting indexing...");
+    logger.info("Starting indexing...", CODEBASE_PATH);
     this.timer = setInterval(() => {
       this.index();
     }, 60 * 1000);
@@ -30,7 +33,11 @@ class Codebase {
   }
 
 
-  private content: string | undefined;
+  private _content: string | undefined;
+
+  get content() {
+    return this._content;
+  }
 
   private contentUpdatedAt: string | undefined;
 
@@ -38,7 +45,7 @@ class Codebase {
 
     return (async () => {
 
-      await logger.info("Indexing codebase...");
+      // await logger.info("Indexing codebase...");
 
       const files = await indexPath(CODEBASE_PATH);
 
@@ -82,18 +89,20 @@ class Codebase {
 
       }).join("\n\n");
 
-      if (this.content === content) {
+      if (this._content === content) {
 
-        await logger.info("No changes detected.");
+        // await logger.info("Indexing: No changes detected.");
 
       } else {
 
-        this.content = content;
+        await logger.info("Indexing: Codebase updated.");
+
+        this._content = content;
         this.contentUpdatedAt = new Date().toISOString();
 
       }
 
-      await logger.info("Indexing completed.");
+      // await logger.info("Indexing completed.");
 
     })();
 
@@ -118,17 +127,43 @@ class Codebase {
 
     return (async () => {
 
+      signal?.throwIfAborted();
+
       if (
-        this.cache &&
+        this.cache?.name &&
         (!this.cache.expireTime || Date.now() < new Date(this.cache.expireTime).getTime()) &&
-        this.cache.model === model &&
+        this.cache.model?.replace(/^models\//, "") === model &&
         this.cacheSystemInstructions === systemInstructions &&
         this.cacheUpdatedAt === this.contentUpdatedAt
       ) {
-        return this.cache;
+        const updatedCache = await ai.caches.update({
+          name: this.cache.name,
+          config: {
+            ttl: `${TTL}s`,
+          },
+        });
+        await logger.info("Extend cache expire time to:", updatedCache.expireTime);
+        this.cache = updatedCache;
+        return updatedCache;
       }
 
-      if (!this.content || !this.contentUpdatedAt) {
+      await logger.info("Cache expired or not matching.", {
+        expireTime: this.cache?.expireTime ? new Date(this.cache.expireTime).getTime() : null,
+        now: Date.now(),
+        model: this.cache?.model?.replace(/^models\//, "") || null,
+        newModel: model,
+        systemInstructions: this.cacheSystemInstructions || null,
+        newSystemInstructions: systemInstructions,
+        updatedAt: this.cacheUpdatedAt || null,
+        newUpdatedAt: this.contentUpdatedAt || null,
+      });
+
+      if (!MODEL.startsWith("gemini-1.5-")) {
+        await logger.warn("Cache is not supported for this model");
+        return undefined;
+      }
+
+      if (!this._content || !this.contentUpdatedAt) {
         await logger.warn("No content to upload.");
         return undefined;
       }
@@ -138,7 +173,7 @@ class Codebase {
       await logger.info("Uploading file for cache...");
 
       const encoder = new TextEncoder();
-      const encodedContent = encoder.encode(this.content);
+      const encodedContent = encoder.encode(this._content);
       const blob = new Blob([encodedContent], { type: "text/plain" });
 
       const uploadedFile = await ai.files.upload({
@@ -164,24 +199,28 @@ class Codebase {
 
       await logger.info("Creating cache...");
 
-      const cache = await ai.caches.create({
-        model: model,
-        config: {
-          contents: createUserContent(createPartFromUri(uploadedFile.uri, "text/plain")),
-          systemInstruction: "You are an expert analyzing transcripts.",
-          ttl: "900s",
-        },
-      });
+      let cache;
+      try {
+        cache = await ai.caches.create({
+          model: model,
+          config: {
+            contents: createUserContent(createPartFromUri(uploadedFile.uri, "text/plain")),
+            systemInstruction: "You are an expert analyzing transcripts.",
+            ttl: `${TTL}s`,
+          },
+        });
+      } catch (error) {
+        await logger.error("Failed to create cache:", error);
+        return undefined;
+      }
+
+      await logger.info("Cache expire time:", cache.expireTime);
 
       signal?.throwIfAborted();
 
       this.cache = cache;
       this.cacheSystemInstructions = systemInstructions;
       this.cacheUpdatedAt = this.contentUpdatedAt;
-
-      logger.info("Cache created:", cache.name, cache.expireTime);
-      logger.info(Date.now());
-      logger.info(new Date(cache.expireTime || "").getTime());
 
       return cache;
 
@@ -219,11 +258,11 @@ interface FileItem extends FileSystemItem {
 async function indexPath(absolutePath: string): Promise<FileItem[]> {
 
   if (!existsSync(absolutePath)) {
-    logger.warn("Path does not exist:", absolutePath);
+    await logger.warn("Path does not exist:", absolutePath);
     return [];
   }
 
-  // logger.info("Indexing path:", absolutePath);
+  // await logger.info("Indexing path:", absolutePath);
 
   const absoluteParentPath = dirname(absolutePath);
   const name = basename(absolutePath);

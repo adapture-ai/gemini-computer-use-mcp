@@ -34,12 +34,20 @@ class Logger {
     await Promise.all([
 
       (async () => {
-        let line = `[${new Date().toISOString()}] [${level.toUpperCase()}]`;
+        let content = "";
         for (const message of messages) {
-          const messageString = typeof message === "string" ? message.replace(/\n$/, "") : JSON.stringify(message);
-          line += ` ${messageString}`;
+          const messageString = typeof message === "string" ? message.replace(/\n$/, "") : JSON.stringify(message, null, 2);
+          content += ` ${messageString}`;
         }
-        await appendFile(filePath, `${line}\n`, "utf-8");
+        content = (
+          content
+            .split("\n")
+            .map((line) => (
+              `[${new Date().toISOString()}] [${level.toUpperCase()}] ${line}`
+            ))
+            .join("\n")
+        );
+        await appendFile(filePath, `${content}\n`, "utf-8");
       })(),
 
       Promise.all(messages.map(async (message) => {
