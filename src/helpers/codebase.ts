@@ -1,7 +1,7 @@
 import { type CachedContent, createPartFromUri, createUserContent } from "@google/genai";
 import { existsSync } from "fs";
 import { readdir, readFile, readlink, stat } from "fs/promises";
-import { basename, dirname } from "path";
+import { basename, dirname, resolve } from "path";
 
 import { ai } from "./ai";
 import { CODEBASE_PATH, MODEL } from "./config";
@@ -14,112 +14,19 @@ const TTL = 15 * 60; // 15 minutes
 class Codebase {
 
 
-  private timer: NodeJS.Timeout | undefined;
-
-  startIndexing() {
-    if (this.timer) return;
-    logger.info("Starting indexing...", CODEBASE_PATH);
-    this.timer = setInterval(() => {
-      this.index();
-    }, 60 * 1000);
-    this.index();
-  }
-
-  stopIndexing() {
-    if (!this.timer) return;
-    logger.info("Stopping indexing...");
-    clearInterval(this.timer);
-    this.timer = undefined;
-  }
-
-
-  private _content: string | undefined;
-
-  get content() {
-    return this._content;
-  }
-
-  private contentUpdatedAt: string | undefined;
-
-  private index() {
-
-    return (async () => {
-
-      // await logger.info("Indexing codebase...");
-
-      const files = await indexPath(CODEBASE_PATH);
-
-      files.sort((a, b) => {
-        if (a.folderPath !== b.folderPath) {
-          return a.folderPath.localeCompare(b.folderPath);
-        }
-        return a.fileName.localeCompare(b.fileName);
-      });
-
-      const content = files.map((file) => {
-
-        let text = "";
-        text += "/**\n";
-        text += ` * File: ${file.fileName}\n`;
-        text += ` * Folder: ${file.folderPath}\n`;
-        text += ` * Updated: ${file.updatedAt}\n`;
-
-        if (file.content.type === "link") {
-          text += " * Type: Link\n";
-          text += ` * Target: ${file.content.target}\n`;
-        }
-
-        if (file.content.type === "binary") {
-          text += " * Type: Binary\n";
-          text += ` * Size: ${file.content.size} bytes\n`;
-        }
-
-        if (file.content.type === "text") {
-          text += " * Type: Text\n";
-        }
-
-        text += "*/\n";
-
-        if (file.content.type === "text") {
-          text += "\n";
-          text += file.content.text;
-        }
-
-        return text;
-
-      }).join("\n\n");
-
-      if (this._content === content) {
-
-        // await logger.info("Indexing: No changes detected.");
-
-      } else {
-
-        await logger.info("Indexing: Codebase updated.");
-
-        this._content = content;
-        this.contentUpdatedAt = new Date().toISOString();
-
-      }
-
-      // await logger.info("Indexing completed.");
-
-    })();
-
-  }
-
-
   private cache: CachedContent | undefined;
 
   private cacheSystemInstructions: string | undefined;
 
-  private cacheUpdatedAt = new Date(0).toISOString();
+  private cacheContent: string | undefined;
 
   getCache({
+    path,
     model,
     systemInstructions,
     signal,
   }: {
+    path: string;
     model: string;
     systemInstructions: string;
     signal?: AbortSignal;
@@ -129,12 +36,16 @@ class Codebase {
 
       signal?.throwIfAborted();
 
+      const absolutePath = resolve(CODEBASE_PATH, path);
+
+      const content = await getContent(absolutePath);
+
       if (
         this.cache?.name &&
         (!this.cache.expireTime || Date.now() < new Date(this.cache.expireTime).getTime()) &&
         this.cache.model?.replace(/^models\//, "") === model &&
         this.cacheSystemInstructions === systemInstructions &&
-        this.cacheUpdatedAt === this.contentUpdatedAt
+        this.cacheContent === content
       ) {
         const updatedCache = await ai.caches.update({
           name: this.cache.name,
@@ -144,7 +55,9 @@ class Codebase {
         });
         await logger.info("Extend cache expire time to:", updatedCache.expireTime);
         this.cache = updatedCache;
-        return updatedCache;
+        return {
+          cache: updatedCache,
+        };
       }
 
       await logger.info("Cache expired or not matching.", {
@@ -154,18 +67,15 @@ class Codebase {
         newModel: model,
         systemInstructions: this.cacheSystemInstructions || null,
         newSystemInstructions: systemInstructions,
-        updatedAt: this.cacheUpdatedAt || null,
-        newUpdatedAt: this.contentUpdatedAt || null,
+        content: this.cacheContent?.length || null,
+        newContent: content.length || null,
       });
 
       if (!MODEL.startsWith("gemini-1.5-")) {
         await logger.warn("Cache is not supported for this model");
-        return undefined;
-      }
-
-      if (!this._content || !this.contentUpdatedAt) {
-        await logger.warn("No content to upload.");
-        return undefined;
+        return {
+          content: content,
+        };
       }
 
       signal?.throwIfAborted();
@@ -173,7 +83,7 @@ class Codebase {
       await logger.info("Uploading file for cache...");
 
       const encoder = new TextEncoder();
-      const encodedContent = encoder.encode(this._content);
+      const encodedContent = encoder.encode(content);
       const blob = new Blob([encodedContent], { type: "text/plain" });
 
       const uploadedFile = await ai.files.upload({
@@ -211,7 +121,9 @@ class Codebase {
         });
       } catch (error) {
         await logger.error("Failed to create cache:", error);
-        return undefined;
+        return {
+          content: content,
+        };
       }
 
       await logger.info("Cache expire time:", cache.expireTime);
@@ -220,9 +132,11 @@ class Codebase {
 
       this.cache = cache;
       this.cacheSystemInstructions = systemInstructions;
-      this.cacheUpdatedAt = this.contentUpdatedAt;
+      this.cacheContent = content;
 
-      return cache;
+      return {
+        cache: cache,
+      };
 
     })();
 
@@ -252,6 +166,58 @@ interface FileItem extends FileSystemItem {
     type: "text";
     text: string;
   };
+}
+
+
+async function getContent(absolutePath: string) {
+
+  // await logger.info("Indexing codebase...");
+
+  const files = await indexPath(absolutePath);
+
+  files.sort((a, b) => {
+    if (a.folderPath !== b.folderPath) {
+      return a.folderPath.localeCompare(b.folderPath);
+    }
+    return a.fileName.localeCompare(b.fileName);
+  });
+
+  const content = files.map((file) => {
+
+    let text = "";
+    text += "/**\n";
+    text += ` * File: ${file.fileName}\n`;
+    text += ` * Folder: ${file.folderPath}\n`;
+    text += ` * Updated: ${file.updatedAt}\n`;
+
+    if (file.content.type === "link") {
+      text += " * Type: Link\n";
+      text += ` * Target: ${file.content.target}\n`;
+    }
+
+    if (file.content.type === "binary") {
+      text += " * Type: Binary\n";
+      text += ` * Size: ${file.content.size} bytes\n`;
+    }
+
+    if (file.content.type === "text") {
+      text += " * Type: Text\n";
+    }
+
+    text += "*/\n";
+
+    if (file.content.type === "text") {
+      text += "\n";
+      text += file.content.text;
+    }
+
+    return text;
+
+  }).join("\n\n");
+
+  // await logger.info("Indexing completed.");
+
+  return content;
 }
 
 

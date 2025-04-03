@@ -8,6 +8,9 @@ import { MODEL } from "../helpers/config";
 import { logger } from "../helpers/logger";
 
 
+const SYSTEM_INSTRUCTION = "You are a helpful assistant that answers questions about the codebase.";
+
+
 export function addAskCodebaseTool(server: McpServer) {
 
   server.tool(
@@ -16,12 +19,12 @@ export function addAskCodebaseTool(server: McpServer) {
     "ask_codebase",
 
     // Description
-    "Ask a question about the codebase",
+    "Ask a question about the codebase under the given path.",
 
     // Params Schema
     {
       question: z.string().describe("The question to ask the codebase"),
-      // path: z.string().describe("The path to a file or directory to search in"),
+      path: z.string().describe("The path to the codebase, can be a file or a directory"),
     },
 
     // Callback
@@ -29,6 +32,7 @@ export function addAskCodebaseTool(server: McpServer) {
 
       const {
         question,
+        path,
       } = args;
 
       const {
@@ -37,13 +41,16 @@ export function addAskCodebaseTool(server: McpServer) {
 
       signal.throwIfAborted();
 
-      const systemInstruction = "You are a helpful assistant that answers questions about the codebase.";
-
       await logger.info("Getting context cache...", MODEL);
       const ta0 = Date.now();
-      const cache = await codebase.getCache({
+      const {
+        cache,
+        content,
+      } = await codebase.getCache({
+        path: path,
         model: MODEL,
-        systemInstructions: systemInstruction,
+        systemInstructions: SYSTEM_INSTRUCTION,
+        signal: signal,
       });
       const ta1 = Date.now();
       await logger.info("Context cache retrieved in", ((ta1 - ta0) / 1000.0).toFixed(1), "seconds.");
@@ -61,14 +68,14 @@ export function addAskCodebaseTool(server: McpServer) {
           const newResponse = await ai.models.generateContent({
             model: MODEL,
             config: {
-              systemInstruction: systemInstruction,
+              systemInstruction: SYSTEM_INSTRUCTION,
             },
             contents: [
               "Answer the question about the codebase.",
               "# QUESTION:",
               `${question}`,
               "# CODEBASE CONTENT:",
-              `${codebase.content}`,
+              `${content}`,
             ].join("\n\n"),
           });
           const tb2 = Date.now();
