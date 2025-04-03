@@ -36,7 +36,18 @@ class Logger {
       (async () => {
         let content = "";
         for (const message of messages) {
-          const messageString = typeof message === "string" ? message.replace(/\n$/, "") : JSON.stringify(message, null, 2);
+          const messageString = (
+            typeof message !== "object" ?
+              String(message) :
+              message instanceof Error ?
+                JSON.stringify({
+                  name: message.name,
+                  message: message.message,
+                  cause: message.cause,
+                  stack: message.stack,
+                }, null, 2) :
+                JSON.stringify(message, null, 2)
+          );
           content += ` ${messageString}`;
         }
         content = (

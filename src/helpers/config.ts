@@ -13,4 +13,4 @@ if (!GOOGLE_API_KEY) {
 }
 
 
-export const MODEL = process.env.MODEL || "gemini-1.5-pro-002";
+export const MODEL = process.env.MODEL || "gemini-2.0-flash";
