@@ -1,8 +1,14 @@
 {
-  "name": "codebase-mcp",
-  "module": "index.ts",
-  "type": "module",
-  "private": true,
+  "name": "@inkr/codebase-mcp",
+  "version": "0.0.1",
+  "files": [
+    "scripts/",
+    "src/"
+  ],
+  "bin": "scripts/bin",
+  "scripts": {
+    "start": "scripts/bin"
+  },
   "devDependencies": {
     "@types/bun": "^1.2.8"
   },
