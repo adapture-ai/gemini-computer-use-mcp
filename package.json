@@ -2,12 +2,12 @@
   "name": "@inkr/codebase-mcp",
   "version": "0.0.1",
   "files": [
-    "src/",
-    "bin"
+    "./src/",
+    "./run"
   ],
-  "bin": "bin",
+  "bin": "./run",
   "scripts": {
-    "start": "bin"
+    "start": "./run"
   },
   "devDependencies": {
     "@types/bun": "^1.2.8"
