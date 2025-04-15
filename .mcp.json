@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "codebase": {
+      "type": "stdio",
+      "timeout": 300,
+      "command": "./run",
+      "env": {
+        "GEMINI_API_KEY": "AIzaSyCzisRE73QKc9e5vMZipbE-jvt0HVqTh2k",
+        "MODEL": "gemini-2.5-pro-preview-03-25"
+      }
+    }
+  }
+}
