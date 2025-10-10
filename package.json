@@ -1,6 +1,6 @@
 {
   "name": "@inkr/gemini-computer-use-mcp",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "type": "module",
   "files": [
     "./src/",
@@ -15,8 +15,7 @@
   },
   "packageManager": "npm@11.6.2",
   "devDependencies": {
-    "@types/node": "^24.7.1",
-    "ts-node": "^10.9.2"
+    "@types/node": "^24.7.1"
   },
   "peerDependencies": {
     "typescript": "^5.9.3"

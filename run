@@ -13,7 +13,7 @@ if [[ ! -d "./node_modules" ]]; then
   npm install >/dev/null
 fi
 
-npx --yes ts-node \
+npx --yes ts-node@latest \
   --esm \
   "${FOLDER}/src/index.ts" \
   -- \
