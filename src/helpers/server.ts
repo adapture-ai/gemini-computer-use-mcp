@@ -5,7 +5,7 @@ import { logger } from "./logger";
 
 
 export const server = new McpServer({
-  name: "Codebase",
+  name: "Gemini Computer Use",
   version: "0.0.1",
 });
 
@@ -21,7 +21,7 @@ server.server.oninitialized = () => {
 
 
 server.server.onerror = (error) => {
-  logger.error("Error in server:", error);
+  logger.error("[server]", error);
 };
 
 
@@ -35,7 +35,7 @@ server.server.onclose = () => {
     try {
       listener();
     } catch (error) {
-      logger.error("Error in close listener:", error);
+      logger.error("[server][close]", error);
     }
   });
 

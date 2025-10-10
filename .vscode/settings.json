@@ -1,9 +1,14 @@
 {
+  
   "cSpell.words": [
     "genai",
     "inkr",
     "Khoa",
     "modelcontextprotocol",
-    "mysqldump"
-  ]
+    "mysqldump",
+    "oninitialized"
+  ],
+  "[markdown]": {
+    "editor.defaultFormatter": "DavidAnson.vscode-markdownlint"
+  }
 }

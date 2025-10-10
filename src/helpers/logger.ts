@@ -4,10 +4,10 @@ import { existsSync } from "fs";
 import { appendFile, mkdir, unlink } from "fs/promises";
 import { dirname } from "path";
 
-import { CODEBASE_PATH } from "./config";
+import { PROJECT_PATH } from "./config";
 
 
-const filePath = `${CODEBASE_PATH}/.codebase/logger.log`;
+const filePath = `${PROJECT_PATH}/.inkr/gemini-computer-use-mcp/logger.log`;
 
 const folderPath = dirname(filePath);
 if (!existsSync(folderPath)) {

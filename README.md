@@ -1,4 +1,4 @@
-# @inkr/codebase-mcp
+# @inkr/gemini-computer-use-mcp
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
@@ -12,7 +12,7 @@ An MCP (Model Context Protocol) server designed to provide tools for interacting
 
 ## 📚 Table of Contents
 
-- [@inkr/codebase-mcp](#inkrcodebase-mcp)
+- [@inkr/gemini-computer-use-mcp](#inkrgemini-computer-use-mcp)
   - [✨ Features](#-features)
   - [📚 Table of Contents](#-table-of-contents)
   - [🚀 Usage](#-usage)
@@ -46,7 +46,7 @@ Follow the configurations in these files, remember to update `env` inside with y
 | ---------------- | -------------------------------------- | -------- | --------------------------- |
 | `GEMINI_API_KEY` | Your Gemini API key                    | Yes      |                             |
 | `MODEL`          | The model to use for codebase analysis | No       | `gemini-2.0-flash`          |
-| `CODEBASE_PATH`  | The path to the codebase               | No       | (current working directory) |
+| `PROJECT_PATH`  | The path to the codebase               | No       | (current working directory) |
 
 ### Tools
 
@@ -57,7 +57,7 @@ Once connected, the client can invoke the tools provided by this server.
 | Argument   | Description                                                             | Required | Default               |
 | ---------- | ----------------------------------------------------------------------- | -------- | --------------------- |
 | `question` | The question to ask about the codebase                                  | Yes      |                       |
-| `path`     | The path of the file or directory to query, relative to `CODEBASE_PATH` | No       | (Use `CODEBASE_PATH`) |
+| `path`     | The path of the file or directory to query, relative to `PROJECT_PATH` | No       | (Use `PROJECT_PATH`) |
 
 ## ⚙️ Development
 

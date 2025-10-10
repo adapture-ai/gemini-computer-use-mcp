@@ -1,23 +1,26 @@
 {
-  "name": "@inkr/codebase-mcp",
-  "version": "0.0.3",
+  "name": "@inkr/gemini-computer-use-mcp",
+  "version": "0.0.1",
   "files": [
     "./src/",
     "./run"
   ],
   "bin": "./run",
   "scripts": {
+    "preinstall": "bun upgrade --stable",
     "start": "./run"
   },
+  "packageManager": "bun@1.2.23",
   "devDependencies": {
-    "@types/bun": "^1.2.8"
+    "@types/bun": "^1.2.23"
   },
   "peerDependencies": {
-    "typescript": "^5.8.2"
+    "typescript": "^5.9.3"
   },
   "dependencies": {
-    "@google/genai": "^0.7.0",
-    "@modelcontextprotocol/sdk": "^1.8.0",
-    "zod": "^3.24.2"
+    "@google/genai": "^1.23.0",
+    "@modelcontextprotocol/sdk": "^1.20.0",
+    "playwright": "^1.56.0",
+    "zod": "^4.1.12"
   }
 }
