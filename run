@@ -10,7 +10,12 @@ FOLDER="$(readlink -f "${BASH_SOURCE[0]}" | xargs dirname)"
 cd "${FOLDER}" || exit 1
 
 if [[ ! -d "./node_modules" ]]; then
-  npx --yes bun@latest install >/dev/null
+  npm install >/dev/null
 fi
 
-npx --yes bun@latest run "${FOLDER}/src/index.ts" -- "$@"
+node \
+  --experimental-strip-types \
+  --trace-uncaught \
+  "${FOLDER}/src/index.ts" \
+  -- \
+  "$@"

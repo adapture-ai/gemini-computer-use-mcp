@@ -3,7 +3,10 @@
     "gemini-computer-use": {
       "type": "stdio",
       "timeout": 300,
-      "command": "./run"
+      "command": "./run",
+      "env": {
+        "VERTEX_PROJECT_KEY": "inkr-9a954"
+      }
     }
   }
 }

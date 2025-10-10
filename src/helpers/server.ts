@@ -1,7 +1,5 @@
-/* eslint-disable import/extensions */
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-
-import { logger } from "./logger";
+import { logger } from "./logger.ts";
 
 
 export const server = new McpServer({

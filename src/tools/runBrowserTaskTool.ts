@@ -3,9 +3,9 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { chromium, type Browser, type Page, type BrowserContext } from "playwright";
 
-import { ai } from "../helpers/ai";
-import { MODEL } from "../helpers/config";
-import { logger } from "../helpers/logger";
+import { ai } from "../helpers/ai.ts";
+import { MODEL } from "../helpers/config.ts";
+import { logger } from "../helpers/logger.ts";
 import { Environment } from "@google/genai";
 
 // Screen dimensions
@@ -275,7 +275,6 @@ export function addRunBrowserTaskTool(server: McpServer) {
     // Params Schema
     {
       task: z.string().describe("The task to perform in the browser"),
-      startUrl: z.string().optional().describe("Optional starting URL (defaults to about:blank)"),
     },
 
     // Callback
@@ -285,7 +284,6 @@ export function addRunBrowserTaskTool(server: McpServer) {
 
         const {
           task,
-          startUrl = "about:blank",
         } = args;
 
         const {
@@ -299,12 +297,6 @@ export function addRunBrowserTaskTool(server: McpServer) {
         
         // Get or create browser
         const { page } = await getBrowser();
-        
-        // Navigate to start URL
-        if (startUrl !== "about:blank") {
-          await logger.info(`Navigating to: ${startUrl}`);
-          await page.goto(startUrl, { waitUntil: "domcontentloaded" });
-        }
 
         // Run agent loop
         const result = await runAgentLoop(page, task, signal);

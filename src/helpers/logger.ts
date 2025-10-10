@@ -1,10 +1,9 @@
-/* eslint-disable import/extensions */
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { existsSync } from "fs";
 import { appendFile, mkdir, unlink } from "fs/promises";
 import { dirname } from "path";
 
-import { PROJECT_PATH } from "./config";
+import { PROJECT_PATH } from "./config.ts";
 
 
 const filePath = `${PROJECT_PATH}/.inkr/gemini-computer-use-mcp/logger.log`;

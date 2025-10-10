@@ -1,6 +1,6 @@
 import { GoogleGenAI } from "@google/genai";
 
-import { GEMINI_API_KEY, VERTEX_PROJECT_KEY } from "./config";
+import { GEMINI_API_KEY, VERTEX_PROJECT_KEY } from "./config.ts";
 
 
 export const ai = new GoogleGenAI({

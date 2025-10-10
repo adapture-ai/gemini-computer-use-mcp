@@ -72,7 +72,6 @@ See the official guidance for capabilities and safety considerations: [Gemini Co
 
 ### Prerequisites
 
-- [Bun](https://bun.sh/)
 - Git
 
 ### Steps
@@ -80,7 +79,7 @@ See the official guidance for capabilities and safety considerations: [Gemini Co
 1. **Install dependencies:**
 
    ```bash
-   bun install
+   npm install
    ```
 
 2. **Configuration:**
@@ -93,13 +92,13 @@ See the official guidance for capabilities and safety considerations: [Gemini Co
 
 ## 💻 Technology Stack
 
-- **Runtime:** [Bun](https://bun.sh/) / [Node.js](https://nodejs.org/)
+- **Runtime:** [Node.js](https://nodejs.org/)
 - **Language:** [TypeScript](https://www.typescriptlang.org/)
 - **Core Libraries:**
   - [@modelcontextprotocol/sdk](https://www.npmjs.com/package/@modelcontextprotocol/sdk): For MCP server implementation.
   - [@google/genai](https://www.npmjs.com/package/@google/genai): For generative AI features.
   - [Zod](https://zod.dev/): For schema validation.
-- **Development:** [@types/bun](https://www.npmjs.com/package/@types/bun), [TypeScript](https://www.npmjs.com/package/typescript)
+- **Development:** [@types/node](https://www.npmjs.com/package/@types/node), [TypeScript](https://www.npmjs.com/package/typescript)
 
 ## 📜 License
 
