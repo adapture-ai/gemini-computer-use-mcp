@@ -54,11 +54,19 @@ Once connected, the client can invoke the tools provided by this server.
 
 #### `run_browser_task`
 
-| Argument | Description                           | Required | Default |
-| -------- | ------------------------------------- | -------- | ------- |
-| `task`   | The high-level task to perform        | Yes      |         |
+| Argument   | Description                                      | Required | Default        |
+| ---------- | ------------------------------------------------ | -------- | -------------- |
+| `task`     | The high-level task to perform                   | Yes      |                |
+| `startUrl` | Optional starting URL for the browser            | No       | `about:blank`  |
 
-This tool leverages Gemini Computer Use to plan and perform UI actions to accomplish the provided task. See the official guidance for capabilities and safety considerations: [Gemini Computer Use](https://ai.google.dev/gemini-api/docs/computer-use).
+This tool leverages Gemini Computer Use to plan and perform UI actions to accomplish the provided task. It implements:
+
+- **Automatic browser management:** Checks for existing browser at `localhost:9222` or starts a new instance
+- **Agent loop:** Continuously captures screenshots, sends them to Gemini, receives UI actions, and executes them
+- **All supported UI actions:** mouse movement, clicks, keyboard input, scrolling, text extraction, and more
+- **Safety guidelines:** Follows Gemini's safety best practices from the official documentation
+
+See the official guidance for capabilities and safety considerations: [Gemini Computer Use](https://ai.google.dev/gemini-api/docs/computer-use).
 
 ## ⚙️ Development
 
