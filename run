@@ -15,7 +15,6 @@ fi
 
 node \
   --experimental-strip-types \
-  --trace-uncaught \
   "${FOLDER}/src/index.ts" \
   -- \
   "$@"

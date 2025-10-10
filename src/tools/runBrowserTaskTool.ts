@@ -6,7 +6,7 @@ import { chromium, type Browser, type Page, type BrowserContext } from "playwrig
 import { ai } from "../helpers/ai.ts";
 import { MODEL } from "../helpers/config.ts";
 import { logger } from "../helpers/logger.ts";
-import { Environment } from "@google/genai";
+import { Environment, type GenerateContentParameters } from "@google/genai";
 
 // Screen dimensions
 const SCREEN_WIDTH = 1440;
@@ -45,14 +45,14 @@ async function getBrowser(): Promise<{ browser: Browser; context: BrowserContext
   const wsEndpoint = await checkExistingBrowser();
   
   if (wsEndpoint) {
-    await logger.info("Connecting to existing browser at localhost:9222");
+    await logger.info("[getBrowser]", "Connecting to existing browser at localhost:9222...");
     browserInstance = await chromium.connectOverCDP("http://localhost:9222");
     contextInstance = browserInstance.contexts()[0] || await browserInstance.newContext({
       viewport: { width: SCREEN_WIDTH, height: SCREEN_HEIGHT },
     });
     pageInstance = contextInstance.pages()[0] || await contextInstance.newPage();
   } else {
-    await logger.info("Starting new browser instance");
+    await logger.info("[getBrowser]", "Starting new browser instance...");
     browserInstance = await chromium.launch({
       headless: false,
       args: ['--remote-debugging-port=9222'],
@@ -140,7 +140,7 @@ async function executeAction(page: Page, functionCall: any): Promise<string> {
         return `Unknown action: ${name}`;
     }
   } catch (error) {
-    await logger.error(`Error executing action ${name}:`, error);
+    await logger.error("[executeAction]", `Error executing action ${name}:`, error);
     throw error;
   }
 }
@@ -163,7 +163,7 @@ async function runAgentLoop(page: Page, task: string, signal: AbortSignal): Prom
     signal.throwIfAborted();
     iterationCount++;
     
-    await logger.info(`Iteration ${iterationCount}: Processing...`);
+    await logger.info("[runAgentLoop]", `Iteration ${iterationCount}: Processing...`);
 
     // Capture current screenshot
     const screenshot = await captureScreenshot(page);
@@ -184,7 +184,7 @@ async function runAgentLoop(page: Page, task: string, signal: AbortSignal): Prom
     });
 
     // Send request to model with Computer Use tool
-    const response = await ai.models.generateContent({
+    const request: GenerateContentParameters = {
       model: MODEL,
       config: {
         tools: [
@@ -196,11 +196,15 @@ async function runAgentLoop(page: Page, task: string, signal: AbortSignal): Prom
         ],
       },
       contents: conversationHistory,
-    });
+    };
+    await logger.info("[runAgentLoop]", "request", JSON.stringify(request, null, 2));
+    
+    const response = await ai.models.generateContent(request);
+    await logger.info("[runAgentLoop]", "response.candidates", JSON.stringify(response.candidates, null, 2));
 
     const candidate = response.candidates?.[0];
     if (!candidate || !candidate.content || !candidate.content.parts) {
-      throw new Error("No candidate or content in response");
+      throw new Error("[runAgentLoop] No candidate or content in response");
     }
 
     // Add model response to history
@@ -216,7 +220,7 @@ async function runAgentLoop(page: Page, task: string, signal: AbortSignal): Prom
       // No more actions, task complete
       const textParts = candidate.content.parts.filter((part: any) => part.text);
       const finalText = textParts.map((part: any) => part.text).join("\n");
-      await logger.info("Task completed");
+      await logger.info("[runAgentLoop]", "Task completed");
       return finalText || "Task completed successfully";
     }
 
@@ -226,7 +230,7 @@ async function runAgentLoop(page: Page, task: string, signal: AbortSignal): Prom
     for (const part of candidate.content.parts) {
       if ((part as any).functionCall) {
         const functionCall = (part as any).functionCall;
-        await logger.info(`Executing action: ${functionCall.name}`);
+        await logger.info("[runAgentLoop]", `Executing action: ${functionCall.name}`, JSON.stringify(functionCall, null, 2));
         
         try {
           const result = await executeAction(page, functionCall);
@@ -259,7 +263,7 @@ async function runAgentLoop(page: Page, task: string, signal: AbortSignal): Prom
     }
   }
 
-  throw new Error("Max iterations reached without completing task");
+  throw new Error("[runAgentLoop] Max iterations reached without completing task");
 }
 
 export function addRunBrowserTaskTool(server: McpServer) {
@@ -292,7 +296,7 @@ export function addRunBrowserTaskTool(server: McpServer) {
 
         signal.throwIfAborted();
 
-        await logger.info(`Starting browser task: ${task}`);
+        await logger.info("[run_browser_task]", `Starting browser task: ${task}`);
         const tb0 = Date.now();
         
         // Get or create browser
@@ -302,7 +306,7 @@ export function addRunBrowserTaskTool(server: McpServer) {
         const result = await runAgentLoop(page, task, signal);
         
         const tb2 = Date.now();
-        await logger.info("Task completed in", ((tb2 - tb0) / 1000.0).toFixed(1), "seconds.");
+        await logger.info("[run_browser_task]", "Task completed in", ((tb2 - tb0) / 1000.0).toFixed(1), "seconds.");
 
         signal.throwIfAborted();
 
@@ -316,7 +320,6 @@ export function addRunBrowserTaskTool(server: McpServer) {
       } catch (error) {
 
         await logger.error("[run_browser_task]", error);
-
         throw error;
       }
 
