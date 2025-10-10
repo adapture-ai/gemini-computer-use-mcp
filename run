@@ -13,8 +13,8 @@ if [[ ! -d "./node_modules" ]]; then
   npm install >/dev/null
 fi
 
-node \
-  --experimental-strip-types \
+npx --yes ts-node \
+  --esm \
   "${FOLDER}/src/index.ts" \
   -- \
   "$@"
