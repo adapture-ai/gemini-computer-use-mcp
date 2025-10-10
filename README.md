@@ -2,13 +2,15 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-An MCP (Model Context Protocol) server designed to provide tools for interacting with codebases, leveraging generative AI capabilities. This server allows AI agents or other MCP clients to ask questions about a specified codebase path.
+An MCP (Model Context Protocol) server for building browser-control agents using Gemini Computer Use. This project enables agents to plan and perform UI actions in a browser.
 
 ## ✨ Features
 
-- **Codebase Interaction:** Provides an MCP tool (`ask_codebase`) to query information about codebases.
-- **Generative AI Integration:** Utilizes `@google/genai` for processing and answering codebase-related questions.
+- **Computer Use (Browser Control):** Provides an MCP tool (`run_browser_task`) to instruct a browser to perform a high-level task using the Gemini Computer Use model.
+- **Generative AI Integration:** Utilizes `@google/genai` for planning and executing computer-use steps.
 - **Stdio Transport:** Communicates using the standard MCP stdio transport mechanism.
+
+Learn more about Gemini Computer Use in the official docs: [Gemini Computer Use](https://ai.google.dev/gemini-api/docs/computer-use)
 
 ## 📚 Table of Contents
 
@@ -19,7 +21,7 @@ An MCP (Model Context Protocol) server designed to provide tools for interacting
     - [Connecting an MCP Client](#connecting-an-mcp-client)
     - [Environment Variables](#environment-variables)
     - [Tools](#tools)
-      - [`ask_codebase`](#ask_codebase)
+      - [`run_browser_task`](#run_browser_task)
   - [⚙️ Development](#️-development)
     - [Prerequisites](#prerequisites)
     - [Steps](#steps)
@@ -33,30 +35,30 @@ This project runs as an MCP server. It's typically invoked by an MCP client or c
 
 ### Connecting an MCP Client
 
-Follow the configurations in these files, remember to update `env` inside with your preference:
-
-- **[Visual Studio Code](https://code.visualstudio.com):** [.vscode/mcp.json](https://github.com/inkr-global/codebase-mcp/blob/main/.vscode/mcp.json)
-- **[Claude](https://claude.ai):** [.mcp.json](https://github.com/inkr-global/codebase-mcp/blob/main/.mcp.json)
-- **[Cursor](https://cursor.com):** [.cursor/mcp.json](https://github.com/inkr-global/codebase-mcp/blob/main/.mcp.json)
+Point your MCP client to this server's executable. If your client supports a config file, use the `.mcp.json` in this repo as a reference and update environment variables as needed.
 
 ### Environment Variables
 
-| Variable         | Description                            | Required | Default                     |
-| ---------------- | -------------------------------------- | -------- | --------------------------- |
-| `GEMINI_API_KEY` | Your Gemini API key                    | Yes      |                             |
-| `MODEL`          | The model to use for codebase analysis | No       | `gemini-2.0-flash`          |
-| `PROJECT_PATH`  | The path to the codebase               | No       | (current working directory) |
+| Variable              | Description                                                      | Required                               | Default                                  |
+| --------------------- | ---------------------------------------------------------------- | --------------------------------------- | ---------------------------------------- |
+| `GEMINI_API_KEY`      | Your Gemini API key                                              | Yes, unless `VERTEX_PROJECT_KEY` is set |                                          |
+| `VERTEX_PROJECT_KEY`  | Vertex AI project key (alternative to `GEMINI_API_KEY`)          | Yes, unless `GEMINI_API_KEY` is set     |                                          |
+| `MODEL`               | The model ID to use                                              | No                                      | `gemini-2.5-computer-use-preview-10-2025`|
+| `PROJECT_PATH`        | Filesystem path used by some tools (defaults to current working directory) | No                            | (current working directory)               |
+
+Note: Either `GEMINI_API_KEY` or `VERTEX_PROJECT_KEY` must be provided (see `src/helpers/config.ts`).
 
 ### Tools
 
 Once connected, the client can invoke the tools provided by this server.
 
-#### `ask_codebase`
+#### `run_browser_task`
 
-| Argument   | Description                                                             | Required | Default               |
-| ---------- | ----------------------------------------------------------------------- | -------- | --------------------- |
-| `question` | The question to ask about the codebase                                  | Yes      |                       |
-| `path`     | The path of the file or directory to query, relative to `PROJECT_PATH` | No       | (Use `PROJECT_PATH`) |
+| Argument | Description                           | Required | Default |
+| -------- | ------------------------------------- | -------- | ------- |
+| `task`   | The high-level task to perform        | Yes      |         |
+
+This tool leverages Gemini Computer Use to plan and perform UI actions to accomplish the provided task. See the official guidance for capabilities and safety considerations: [Gemini Computer Use](https://ai.google.dev/gemini-api/docs/computer-use).
 
 ## ⚙️ Development
 
@@ -73,9 +75,9 @@ Once connected, the client can invoke the tools provided by this server.
    bun install
    ```
 
-2. **Configuration (if necessary):**
+2. **Configuration:**
 
-   - Check if any specific environment variables are required for `@google/genai` (e.g., API keys). Create a `.env` file if needed. (Further investigation might be needed to confirm required variables).
+   - Set `GEMINI_API_KEY` or `VERTEX_PROJECT_KEY`. Optionally set `MODEL` and `PROJECT_PATH`.
 
 3. **Run:**
    - **In IDEs:** Reload window and check if the MCP is connected
