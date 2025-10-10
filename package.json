@@ -6,7 +6,9 @@
     "./src/",
     "./run"
   ],
-  "bin": "./run",
+  "bin": {
+    "gemini-computer-use-mcp": "run"
+  },
   "scripts": {
     "clean": "rm -rf ./node_modules ./package-lock.json",
     "start": "./run"
