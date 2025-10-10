@@ -6,7 +6,8 @@
     "Khoa",
     "modelcontextprotocol",
     "mysqldump",
-    "oninitialized"
+    "oninitialized",
+    "vertexai"
   ],
   "[markdown]": {
     "editor.defaultFormatter": "DavidAnson.vscode-markdownlint"

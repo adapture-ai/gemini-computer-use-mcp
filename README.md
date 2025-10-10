@@ -38,7 +38,6 @@ Follow the configurations in these files, remember to update `env` inside with y
 - **[Visual Studio Code](https://code.visualstudio.com):** [.vscode/mcp.json](https://github.com/inkr-global/codebase-mcp/blob/main/.vscode/mcp.json)
 - **[Claude](https://claude.ai):** [.mcp.json](https://github.com/inkr-global/codebase-mcp/blob/main/.mcp.json)
 - **[Cursor](https://cursor.com):** [.cursor/mcp.json](https://github.com/inkr-global/codebase-mcp/blob/main/.mcp.json)
-- **[Roo Code](https://github.com/RooVetGit/Roo-Code):** [.roo/mcp.json](https://github.com/inkr-global/codebase-mcp/blob/main/.mcp.json)
 
 ### Environment Variables
 
