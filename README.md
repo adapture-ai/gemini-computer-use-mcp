@@ -51,7 +51,7 @@ Point your MCP client to this server's executable. If your client supports a con
       "command": "npx",
       "args": ["--yes", "@inkr/gemini-computer-use-mcp@latest"],
       "env": {
-        "VERTEX_PROJECT_KEY": "inkr-9a954"
+        "VERTEX_PROJECT_KEY": "vertex-project-key"
       }
     }
   }
@@ -60,7 +60,7 @@ Point your MCP client to this server's executable. If your client supports a con
 
 #### SSE Mode
 
-Start server with `VERTEX_PROJECT_KEY=inkr-9a954 PORT=8888 npx --yes @inkr/gemini-computer-use-mcp@latest --server`.
+Start server with `VERTEX_PROJECT_KEY=vertex-project-key npx --yes @inkr/gemini-computer-use-mcp@latest --server`.
 
 ```JSON
 {
@@ -76,7 +76,7 @@ Start server with `VERTEX_PROJECT_KEY=inkr-9a954 PORT=8888 npx --yes @inkr/gemin
 
 #### Streamable HTTP Mode
 
-Start server with `VERTEX_PROJECT_KEY=inkr-9a954 PORT=8888 npx --yes @inkr/gemini-computer-use-mcp@latest --server`.
+Start server with `VERTEX_PROJECT_KEY=vertex-project-key npx --yes @inkr/gemini-computer-use-mcp@latest --server`.
 
 ```JSON
 {
