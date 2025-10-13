@@ -8,7 +8,7 @@ An MCP (Model Context Protocol) server for building browser-control agents using
 
 - **Computer Use (Browser Control):** Provides an MCP tool (`run_browser_task`) to instruct a browser to perform a high-level task using the Gemini Computer Use model.
 - **Generative AI Integration:** Utilizes `@google/genai` for planning and executing computer-use steps.
-- **Stdio Transport:** Communicates using the standard MCP stdio transport mechanism.
+- **stdio Transport:** Communicates using the standard MCP stdio transport mechanism.
 
 Learn more about Gemini Computer Use in the official docs: [Gemini Computer Use](https://ai.google.dev/gemini-api/docs/computer-use)
 
@@ -19,7 +19,7 @@ Learn more about Gemini Computer Use in the official docs: [Gemini Computer Use]
   - [📚 Table of Contents](#-table-of-contents)
   - [🚀 Usage](#-usage)
     - [Connecting an MCP Client](#connecting-an-mcp-client)
-      - [StdIO Mode](#stdio-mode)
+      - [stdio Mode](#stdio-mode)
       - [SSE Mode](#sse-mode)
       - [Streamable HTTP Mode](#streamable-http-mode)
     - [Environment Variables](#environment-variables)
@@ -40,7 +40,7 @@ This project runs as an MCP server. It's typically invoked by an MCP client or c
 
 Point your MCP client to this server's executable. If your client supports a config file, use the following configs:
 
-#### StdIO Mode
+#### stdio Mode
 
 ```JSON
 {
