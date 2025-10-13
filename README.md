@@ -19,6 +19,8 @@ Learn more about Gemini Computer Use in the official docs: [Gemini Computer Use]
   - [📚 Table of Contents](#-table-of-contents)
   - [🚀 Usage](#-usage)
     - [Connecting an MCP Client](#connecting-an-mcp-client)
+      - [StdIO Mode](#stdio-mode)
+      - [Streamable HTTP Mode](#streamable-http-mode)
     - [Environment Variables](#environment-variables)
     - [Tools](#tools)
       - [`run_browser_task`](#run_browser_task)
@@ -35,16 +37,51 @@ This project runs as an MCP server. It's typically invoked by an MCP client or c
 
 ### Connecting an MCP Client
 
-Point your MCP client to this server's executable. If your client supports a config file, use the `.mcp.json` in this repo as a reference and update environment variables as needed.
+Point your MCP client to this server's executable. If your client supports a config file, use the following configs:
+
+#### StdIO Mode
+
+```JSON
+{
+  "mcpServers": {
+    "gemini-computer-use": {
+      "type": "stdio",
+      "timeout": 300,
+      "command": "npx",
+      "args": ["--yes", "@inkr/gemini-computer-use-mcp@latest"],
+      "env": {
+        "VERTEX_PROJECT_KEY": "inkr-9a954"
+      }
+    }
+  }
+}
+```
+
+#### Streamable HTTP Mode
+
+Start server with `VERTEX_PROJECT_KEY=inkr-9a954 PORT=8888 npx --yes @inkr/gemini-computer-use-mcp@latest --stream`.
+
+```JSON
+{
+  "mcpServers": {
+    "gemini-computer-use": {
+      "type": "streamable-http",
+      "timeout": 300,
+      "url": "http://localhost:8888/mcp"
+    }
+  }
+}
+```
 
 ### Environment Variables
 
-| Variable              | Description                                                      | Required                               | Default                                  |
-| --------------------- | ---------------------------------------------------------------- | --------------------------------------- | ---------------------------------------- |
-| `GEMINI_API_KEY`      | Your Gemini API key                                              | Yes, unless `VERTEX_PROJECT_KEY` is set |                                          |
-| `VERTEX_PROJECT_KEY`  | Vertex AI project key (alternative to `GEMINI_API_KEY`)          | Yes, unless `GEMINI_API_KEY` is set     |                                          |
-| `MODEL`               | The model ID to use                                              | No                                      | `gemini-2.5-computer-use-preview-10-2025`|
-| `PROJECT_PATH`        | Filesystem path used by some tools (defaults to current working directory) | No                            | (current working directory)               |
+| Variable              | Description                                                                | Required                                | Default                                  |
+| --------------------- | -------------------------------------------------------------------------- | --------------------------------------- | ---------------------------------------- |
+| `GEMINI_API_KEY`      | Your Gemini API key                                                        | Yes, unless `VERTEX_PROJECT_KEY` is set |                                          |
+| `VERTEX_PROJECT_KEY`  | Vertex AI project key (alternative to `GEMINI_API_KEY`)                    | Yes, unless `GEMINI_API_KEY` is set     |                                          |
+| `MODEL`               | The model ID to use                                                        | No                                      | `gemini-2.5-computer-use-preview-10-2025`|
+| `PROJECT_PATH`        | Filesystem path used by some tools (defaults to current working directory) | No                                      | (current working directory)              |
+| `PORT`                | Server port to use (only for streamable HTTP)                              | No                                      | 8888                                     |
 
 Note: Either `GEMINI_API_KEY` or `VERTEX_PROJECT_KEY` must be provided (see `src/helpers/config.ts`).
 
