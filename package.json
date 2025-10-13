@@ -1,6 +1,6 @@
 {
   "name": "@inkr/gemini-computer-use-mcp",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "type": "module",
   "files": [
     "./src/",
@@ -15,6 +15,7 @@
   },
   "packageManager": "npm@11.6.2",
   "devDependencies": {
+    "@types/express": "^5.0.3",
     "@types/node": "^24.7.1"
   },
   "peerDependencies": {
@@ -23,6 +24,7 @@
   "dependencies": {
     "@google/genai": "^1.23.0",
     "@modelcontextprotocol/sdk": "^1.20.0",
+    "express": "^4.21.2",
     "playwright": "^1.56.0",
     "zod": "^3.25.76"
   }

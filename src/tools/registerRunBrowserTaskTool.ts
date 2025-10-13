@@ -628,19 +628,22 @@ async function runAgentLoop(page: Page, task: string, signal: AbortSignal): Prom
   throw new Error("[runAgentLoop] Max iterations reached without completing task");
 }
 
-export function addRunBrowserTaskTool(server: McpServer) {
+export function registerRunBrowserTaskTool(server: McpServer) {
 
-  server.tool(
+  server.registerTool(
 
     // Name
     "run_browser_task",
 
-    // Description
-    "Control browser to perform a task using Gemini Computer Use",
-
-    // Params Schema
     {
-      task: z.string().describe("The task to perform in the browser"),
+      title: "Run Browser Task",
+      description: "Control browser to perform a task using Gemini Computer Use",
+      inputSchema: {
+        task: z.string().describe("The task to perform in the browser"),
+      },
+      outputSchema: {
+        text: z.string().describe("The result of the task"),
+      },
     },
 
     // Callback
