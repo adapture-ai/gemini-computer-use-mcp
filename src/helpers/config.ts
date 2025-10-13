@@ -16,8 +16,8 @@ export const VERTEX_PROJECT_KEY = (
 );
 
 
-if (!GEMINI_API_KEY && !VERTEX_PROJECT_KEY) {
-  throw "GEMINI_API_KEY or VERTEX_PROJECT_KEY is required in env";
+if (!VERTEX_PROJECT_KEY && !GEMINI_API_KEY) {
+  throw "VERTEX_PROJECT_KEY or GEMINI_API_KEY is required in env";
 }
 
 

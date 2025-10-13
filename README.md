@@ -94,8 +94,8 @@ Start server with `VERTEX_PROJECT_KEY=vertex-project-key npx --yes @inkr/gemini-
 
 | Variable              | Description                                                                | Required                                | Default                                  |
 | --------------------- | -------------------------------------------------------------------------- | --------------------------------------- | ---------------------------------------- |
+| `VERTEX_PROJECT_KEY`  | Vertex AI project key (preferred over `GEMINI_API_KEY`)                    | Yes, unless `GEMINI_API_KEY` is set     |                                          |
 | `GEMINI_API_KEY`      | Your Gemini API key                                                        | Yes, unless `VERTEX_PROJECT_KEY` is set |                                          |
-| `VERTEX_PROJECT_KEY`  | Vertex AI project key (alternative to `GEMINI_API_KEY`)                    | Yes, unless `GEMINI_API_KEY` is set     |                                          |
 | `MODEL`               | The model ID to use                                                        | No                                      | `gemini-2.5-computer-use-preview-10-2025`|
 | `PROJECT_PATH`        | Filesystem path used by some tools (defaults to current working directory) | No                                      | (current working directory)              |
 | `PORT`                | Server port to use (only for streamable HTTP)                              | No                                      | 8888                                     |
