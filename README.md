@@ -111,7 +111,6 @@ Once connected, the client can invoke the tools provided by this server.
 | Argument   | Description                                      | Required | Default        |
 | ---------- | ------------------------------------------------ | -------- | -------------- |
 | `task`     | The high-level task to perform                   | Yes      |                |
-| `startUrl` | Optional starting URL for the browser            | No       | `about:blank`  |
 
 This tool leverages Gemini Computer Use to plan and perform UI actions to accomplish the provided task. It implements:
 
