@@ -20,6 +20,7 @@ Learn more about Gemini Computer Use in the official docs: [Gemini Computer Use]
   - [🚀 Usage](#-usage)
     - [Connecting an MCP Client](#connecting-an-mcp-client)
       - [StdIO Mode](#stdio-mode)
+      - [SSE Mode](#sse-mode)
       - [Streamable HTTP Mode](#streamable-http-mode)
     - [Environment Variables](#environment-variables)
     - [Tools](#tools)
@@ -57,6 +58,22 @@ Point your MCP client to this server's executable. If your client supports a con
 }
 ```
 
+#### SSE Mode
+
+Start server with `VERTEX_PROJECT_KEY=inkr-9a954 PORT=8888 npx --yes @inkr/gemini-computer-use-mcp@latest --stream`.
+
+```JSON
+{
+  "mcpServers": {
+    "gemini-computer-use": {
+      "type": "sse",
+      "timeout": 300,
+      "url": "http://localhost:8888/sse"
+    }
+  }
+}
+```
+
 #### Streamable HTTP Mode
 
 Start server with `VERTEX_PROJECT_KEY=inkr-9a954 PORT=8888 npx --yes @inkr/gemini-computer-use-mcp@latest --stream`.
@@ -65,7 +82,7 @@ Start server with `VERTEX_PROJECT_KEY=inkr-9a954 PORT=8888 npx --yes @inkr/gemin
 {
   "mcpServers": {
     "gemini-computer-use": {
-      "type": "streamable-http",
+      "type": "http",
       "timeout": 300,
       "url": "http://localhost:8888/mcp"
     }
