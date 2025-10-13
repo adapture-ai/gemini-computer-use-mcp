@@ -153,7 +153,9 @@ try {
   
     const port = parseInt(process.env.PORT || "8888");
     app.listen(port, () => {
-      console.log(`Gemini Computer Use MCP Server running on http://localhost:${port}/mcp and http://localhost:${port}/sse`);
+      console.log(`Gemini Computer Use MCP Server running on:`); 
+      console.log(`- SSE (legacy)    : http://localhost:${port}/sse`);
+      console.log(`- Streamable HTTP : http://localhost:${port}/mcp`);
     }).on("error", (error) => {
       console.error("Server error:", error);
       process.exit(1);
