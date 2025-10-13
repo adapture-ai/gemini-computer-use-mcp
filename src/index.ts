@@ -26,12 +26,12 @@ try {
 
   const {
     values: {
-      stream,
+      server: useServer,
     },
   } = parseArgs({
     args: args,
     options: {
-      stream: {
+      server: {
         type: "boolean",
         short: "s",
         default: false,
@@ -43,7 +43,7 @@ try {
 
   registerRunBrowserTaskTool(server);
 
-  if (stream) {
+  if (useServer) {
 
     const app = express();
 

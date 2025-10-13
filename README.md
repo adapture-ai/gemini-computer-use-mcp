@@ -60,7 +60,7 @@ Point your MCP client to this server's executable. If your client supports a con
 
 #### SSE Mode
 
-Start server with `VERTEX_PROJECT_KEY=inkr-9a954 PORT=8888 npx --yes @inkr/gemini-computer-use-mcp@latest --stream`.
+Start server with `VERTEX_PROJECT_KEY=inkr-9a954 PORT=8888 npx --yes @inkr/gemini-computer-use-mcp@latest --server`.
 
 ```JSON
 {
@@ -76,7 +76,7 @@ Start server with `VERTEX_PROJECT_KEY=inkr-9a954 PORT=8888 npx --yes @inkr/gemin
 
 #### Streamable HTTP Mode
 
-Start server with `VERTEX_PROJECT_KEY=inkr-9a954 PORT=8888 npx --yes @inkr/gemini-computer-use-mcp@latest --stream`.
+Start server with `VERTEX_PROJECT_KEY=inkr-9a954 PORT=8888 npx --yes @inkr/gemini-computer-use-mcp@latest --server`.
 
 ```JSON
 {
