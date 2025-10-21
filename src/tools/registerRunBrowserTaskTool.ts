@@ -62,6 +62,7 @@ async function getBrowser(): Promise<{ browser: Browser; context: BrowserContext
           await chromium.connectOverCDP(wsEndpoint) : 
           await chromium.launch({
             headless: false,
+            channel: "chrome",
             args: ["--remote-debugging-port=9222"],
           })
         )

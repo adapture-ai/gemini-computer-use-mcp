@@ -6,7 +6,7 @@ import { dirname } from "path";
 import { PROJECT_PATH } from "./config.ts";
 
 
-const sessionID = new Date().toISOString();
+const sessionID = new Date().toISOString().replace(/[:.]/g, "-");
 
 const filePath = `${PROJECT_PATH}/.inkr/gemini-computer-use-mcp/${sessionID}/logger.log`;
 
