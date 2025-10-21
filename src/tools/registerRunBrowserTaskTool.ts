@@ -432,12 +432,15 @@ async function executeAction(page: Page, functionCall: FunctionCall): Promise<Ac
   }
 }
 
+
 /**
  * Main agent loop
  */
 async function runAgentLoop(page: Page, task: string, signal: AbortSignal): Promise<string> {
+
   let taskAdded = false;
   const conversationHistory: Content[] = [];
+
   let iterationCount = 0;
   const maxIterations = 50; // Prevent infinite loops
 
@@ -528,20 +531,26 @@ async function runAgentLoop(page: Page, task: string, signal: AbortSignal): Prom
     let lastMessage = "";
 
     for (const part of candidate.content.parts) {
+
       if ((part as any).functionCall) {
+
         const functionCall = (part as any).functionCall as FunctionCall;
+
         await logger.info("[runAgentLoop]", `Executing action: ${functionCall.name}`, JSON.stringify(functionCall, null, 2).replace(/"data": "[^"]*"/g, '"data": "[Base64 Data]"'));
 
         let responsePayload: Record<string, unknown> = {};
 
         try {
+
           const result = await executeAction(page, functionCall);
           lastMessage = result.message;
+
           if (result.status === "skipped") {
             requiresConfirmation = true;
           }
 
           const screenshotAfterAction = await captureScreenshot(page);
+
           responsePayload = {
             status: result.status,
             message: result.message,
@@ -580,8 +589,11 @@ async function runAgentLoop(page: Page, task: string, signal: AbortSignal): Prom
 
           // Allow UI to settle before processing next action
           await page.waitForTimeout(500);
+
         } catch (error) {
+
           const screenshotAfterError = await captureScreenshot(page);
+
           responsePayload = {
             status: "error",
             error: String(error),
@@ -628,6 +640,7 @@ async function runAgentLoop(page: Page, task: string, signal: AbortSignal): Prom
 
   throw new Error("[runAgentLoop] Max iterations reached without completing task");
 }
+
 
 export function registerRunBrowserTaskTool(server: McpServer) {
 

@@ -19,10 +19,10 @@ if (!existsSync(folderPath)) {
 class Logger {
 
 
-  private server: McpServer | undefined;
+  private _server: McpServer | undefined;
 
-  setServer(server: McpServer) {
-    this.server = server;
+  setServer(newServer: McpServer) {
+    this._server = newServer;
   }
 
 
@@ -30,6 +30,7 @@ class Logger {
 
     await Promise.all([
 
+      // Log to file
       (async () => {
         let content = "";
         for (const message of messages) {
@@ -58,13 +59,17 @@ class Logger {
         await appendFile(filePath, `${content}\n`, "utf-8");
       })(),
 
-      Promise.all(messages.map(async (message) => {
-        await this.server?.server.sendLoggingMessage({
-          logger: "logger",
-          level: level,
-          data: message,
-        });
-      })),
+      // Log to MCP server
+      (async () => {
+        const server = this._server;
+        if (!server) return;
+        for (const message of messages) {
+          await server.sendLoggingMessage({
+            level: level,
+            data: message,
+          });  
+        }
+      })(),
 
     ]);
 

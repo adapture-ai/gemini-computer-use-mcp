@@ -10,11 +10,11 @@ export const server = new McpServer({
 
 server.server.oninitialized = () => {
 
-  logger.info("Server initialized");
-
   if (server.server.getClientCapabilities()?.logging) {
     logger.setServer(server);
   }
+
+  logger.info("Server initialized");
 };
 
 
