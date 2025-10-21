@@ -6,15 +6,13 @@ import { dirname } from "path";
 import { PROJECT_PATH } from "./config.ts";
 
 
-const filePath = `${PROJECT_PATH}/.inkr/gemini-computer-use-mcp/logger.log`;
+const sessionID = new Date().toISOString();
+
+const filePath = `${PROJECT_PATH}/.inkr/gemini-computer-use-mcp/${sessionID}/logger.log`;
 
 const folderPath = dirname(filePath);
 if (!existsSync(folderPath)) {
   await mkdir(folderPath, { recursive: true });
-}
-
-if (existsSync(filePath)) {
-  await unlink(filePath);
 }
 
 

@@ -43,6 +43,7 @@ Point your MCP client to this server's executable. If your client supports a con
 #### stdio Mode
 
 ```JSON
+// .mcp.json
 {
   "mcpServers": {
     "gemini-computer-use": {
@@ -58,11 +59,30 @@ Point your MCP client to this server's executable. If your client supports a con
 }
 ```
 
+```YAML
+# ~/.codex/config.toml
+tool_timeout_sec = 300
+
+[mcp_servers.gemini-computer-use]
+command = "npx"
+args = ["--yes", "@inkr/gemini-computer-use-mcp@latest"]
+
+[mcp_servers.gemini-computer-use.env]
+VERTEX_PROJECT_KEY = "vertex-project-key"
+```
+
 #### SSE Mode
 
-Start server with `VERTEX_PROJECT_KEY=vertex-project-key npx --yes @inkr/gemini-computer-use-mcp@latest --server`.
+Start server with:
+
+```bash
+VERTEX_PROJECT_KEY=vertex-project-key npx --yes @inkr/gemini-computer-use-mcp@latest --server
+```
+
+Then add:
 
 ```JSON
+// .mcp.json
 {
   "mcpServers": {
     "gemini-computer-use": {
@@ -76,9 +96,16 @@ Start server with `VERTEX_PROJECT_KEY=vertex-project-key npx --yes @inkr/gemini-
 
 #### Streamable HTTP Mode
 
-Start server with `VERTEX_PROJECT_KEY=vertex-project-key npx --yes @inkr/gemini-computer-use-mcp@latest --server`.
+Start server with:
+
+```bash
+VERTEX_PROJECT_KEY=vertex-project-key npx --yes @inkr/gemini-computer-use-mcp@latest --server
+```
+
+Then add:
 
 ```JSON
+// .mcp.json
 {
   "mcpServers": {
     "gemini-computer-use": {
@@ -88,6 +115,14 @@ Start server with `VERTEX_PROJECT_KEY=vertex-project-key npx --yes @inkr/gemini-
     }
   }
 }
+```
+
+```YAML
+# ~/.codex/config.toml
+tool_timeout_sec = 300
+
+[mcp_servers.gemini-computer-use]
+url = "http://localhost:8888/mcp"
 ```
 
 ### Environment Variables
