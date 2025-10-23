@@ -1,22 +1,12 @@
 {
   "mcpServers": {
-    "gemini-computer-use-stdio": {
+    "gemini-computer-use": {
       "type": "stdio",
       "timeout": 300,
       "command": "./run",
       "env": {
         "VERTEX_PROJECT_KEY": "vertex-project-key"
       }
-    },
-    "gemini-computer-use-sse": {
-      "type": "sse",
-      "timeout": 300,
-      "url": "http://localhost:8888/sse"
-    },
-    "gemini-computer-use-http": {
-      "type": "http",
-      "timeout": 300,
-      "url": "http://localhost:8888/mcp"
     }
   }
 }
