@@ -458,7 +458,7 @@ async function runAgentLoop(page: Page, task: string, signal: AbortSignal): Prom
     conversationHistory.push({
       role: "user",
       parts: [
-        { text: (taskAdded ? "" : `${task}. `) + `Current URL: ${currentUrl}` },
+        // { text: (taskAdded ? "" : `${task}. `) + `Current URL: ${currentUrl}` },
         {
           inlineData: {
             mimeType: "image/jpeg",
