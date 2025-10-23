@@ -8,7 +8,7 @@ import { PROJECT_PATH } from "./config.ts";
 
 const sessionID = new Date().toISOString().replace(/[:.]/g, "-");
 
-const filePath = `${PROJECT_PATH}/.inkr/gemini-computer-use-mcp/${sessionID}/logger.log`;
+const filePath = `${PROJECT_PATH}/.gemini-computer-use-mcp/${sessionID}/logger.log`;
 
 const folderPath = dirname(filePath);
 if (!existsSync(folderPath)) {

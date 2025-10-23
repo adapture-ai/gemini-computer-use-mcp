@@ -1,4 +1,4 @@
-# @inkr/gemini-computer-use-mcp
+# Gemini Computer Use MCP
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
@@ -14,7 +14,7 @@ Learn more about Gemini Computer Use in the official docs: [Gemini Computer Use]
 
 ## 📚 Table of Contents
 
-- [@inkr/gemini-computer-use-mcp](#inkrgemini-computer-use-mcp)
+- [Gemini Computer Use MCP](#gemini-computer-use-mcp)
   - [✨ Features](#-features)
   - [📚 Table of Contents](#-table-of-contents)
   - [🚀 Usage](#-usage)
@@ -50,7 +50,7 @@ Point your MCP client to this server's executable. If your client supports a con
       "type": "stdio",
       "timeout": 300,
       "command": "npx",
-      "args": ["--yes", "@inkr/gemini-computer-use-mcp@latest"],
+      "args": ["--yes", "gemini-computer-use-mcp@latest"],
       "env": {
         "VERTEX_PROJECT_KEY": "vertex-project-key"
       }
@@ -65,7 +65,7 @@ tool_timeout_sec = 300
 
 [mcp_servers.gemini-computer-use]
 command = "npx"
-args = ["--yes", "@inkr/gemini-computer-use-mcp@latest"]
+args = ["--yes", "gemini-computer-use-mcp@latest"]
 
 [mcp_servers.gemini-computer-use.env]
 VERTEX_PROJECT_KEY = "vertex-project-key"
@@ -76,7 +76,7 @@ VERTEX_PROJECT_KEY = "vertex-project-key"
 Start server with:
 
 ```bash
-VERTEX_PROJECT_KEY=vertex-project-key npx --yes @inkr/gemini-computer-use-mcp@latest --server
+VERTEX_PROJECT_KEY=vertex-project-key npx --yes gemini-computer-use-mcp@latest --server
 ```
 
 Then add:
@@ -99,7 +99,7 @@ Then add:
 Start server with:
 
 ```bash
-VERTEX_PROJECT_KEY=vertex-project-key npx --yes @inkr/gemini-computer-use-mcp@latest --server
+VERTEX_PROJECT_KEY=vertex-project-key npx --yes gemini-computer-use-mcp@latest --server
 ```
 
 Then add:
@@ -191,9 +191,8 @@ See the official guidance for capabilities and safety considerations: [Gemini Co
 ## 📜 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-Copyright (c) 2025 INKR Global
+Copyright (c) 2025 Khoa Nguyen
 
 ## 📧 Contact
 
-- Khoa Nguyen @ [khoa@inkr.com](mailto:khoa@inkr.com)
-- INKR Global @ [inkr.com](https://inkr.com)
+- Khoa Nguyen @ [tkhoa87@gmail.com](mailto:tkhoa87@gmail.com)
